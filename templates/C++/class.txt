@@ -1,8 +1,0 @@
-/*
-<class_name>: <description>
-*/
-class <class_name> {
-public:
-protected:
-private:
-};
