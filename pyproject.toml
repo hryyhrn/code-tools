@@ -1,0 +1,8 @@
+[project]
+name = "code-tools"
+version = "1.0.0"
+description = "Code tools to help the lazy survive"
+dependencies = [
+
+]
+requires-python = ">=3.12.3"

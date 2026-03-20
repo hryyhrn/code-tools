@@ -1,0 +1,11 @@
+# Python
+.python-version
+*env
+__pycache__
+*.egg-info
+
+# Env
+.env
+
+# Data
+data
