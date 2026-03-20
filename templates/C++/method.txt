@@ -1,0 +1,7 @@
+/* 
+<method_name>: <description> 
+<parameter_list_description>
+*/
+<return_type> <method_name>(<parameter_list>) {
+    // Method logic
+}
