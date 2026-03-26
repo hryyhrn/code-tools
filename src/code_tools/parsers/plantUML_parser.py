@@ -9,8 +9,8 @@ class plantUML_parser :
     plantUML parser class. Parses .puml files and extracts classes, fields, methods.
 
     Args:
-        parsed_file (str): Holds the parsed .puml string
-        parsed_classes (List[str]): Holds all the classes contained in the .puml string 
+        _file (str): Holds the parsed .puml string
+        _class_members (List[str]): Holds all the classes contained in the .puml string 
     """
     
     def __init__(self) :
@@ -20,6 +20,7 @@ class plantUML_parser :
 
         self._file = None
         self._classes = None
+        self._class_members = None
     
     def parse_file(self, path) -> None :
         """
@@ -37,11 +38,30 @@ class plantUML_parser :
         Extract classes out of the .puml file's contents
         """
 
-        pattern = "class.*?}"
-        self._classes = re.findall(pattern, self._file, re.DOTALL)
+        class_pattern = r"class.*?}"
+        _classes = re.findall(class_pattern, self._file, re.DOTALL)
 
-    def _parse_methods() :
-        pass
+        public_pattern = r"\+.*?\n"
+        protected_pattern = r"#.*?\n"
+        private_pattern = r"-.*?\n"
 
-    def _parse_fields() :
-        pass
+        # Extract public, protected, private attributes of each class
+        for cl in _classes :
+            # Extract class name
+            items_to_remove = ["class", " ", "{"]
+            pattern = '|'.join(map(re.escape, items_to_remove))
+            class_name = re.sub(pattern, "", re.findall(r"class.*?\{", cl, re.DOTALL)[0])
+            print(class_name)
+
+            _attrs = []
+            _attrs.append(re.findall(public_pattern, cl))
+            _attrs.append(re.findall(protected_pattern, cl))
+            _attrs.append(re.findall(private_pattern, cl))
+
+            # Extract fields and methods from each type of attrs
+            for attr_type in _attrs :
+                for attr in attr_type :
+                    if re.search(r"\(.*?\)", attr, re.DOTALL) :
+                        print(f"Method: {attr}")
+                    else :
+                        print(f"Field: {attr}")
