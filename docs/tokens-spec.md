@@ -5,13 +5,19 @@
 ```
 class
 function
+void
+int
+char
+bool
+str
+float
 ```
 ---
 
 ## 2. Identifiers
 
 ```
-<string_identifier> (alphanumeric and underscore)
+<string_identifier> (alphanumeric and underscore)(Can't start with a digit)
 ```
 ---
 
@@ -24,19 +30,7 @@ function
 ```
 ---
 
-## 4. Data types
-
-```
-void
-int
-char
-bool
-str
-float
-```
----
-
-## 5. Punctuators
+## 4. Punctuators
 
 ```
 {}
@@ -46,24 +40,19 @@ float
 ```
 ---
 
-## 6. Operators
+## 5. Operators
 
 ```
 =
 ```
 ---
 
-## 7. Literals
+## 6. Literals
 
 ```
 <numeric>
-"<string_literal>"
-```
----
-
-## 8. Comments
-
-```
-'
+"<string_literal>" (alphanumeric and underscore)
+True
+False
 ```
 ---
