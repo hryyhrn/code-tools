@@ -17,6 +17,13 @@ class dslLexer :
     """
 
     def __init__(self, path: str = None) :
+        """
+        Init
+
+        Args:
+            path (str): Path to the .dsl file
+        """
+        
         self.content: str
         self._index: int
         
@@ -24,15 +31,33 @@ class dslLexer :
             self.lexDSL(path)
 
     def lexDSL(self, path: str) -> None :
+        """
+        Load and lex a .dsl file
+
+        Args:
+            path (str): Path to the .dsl file
+        """
+        
         self._index = 0
         self._readDSL(path)
         self._lex()
 
     def _readDSL(self, path: str) -> None :
+        """
+        Read file
+        
+        Args:
+            path (str): Path to the .dsl file
+        """
+
         with open(path, "r") as file :
             self.content = file.read()
 
     def _lex(self) -> None :
+        """
+        Lexically analyse the contents of the .dsl file, (the algo).
+        """
+
         self._index = 0
 
         char = ""
@@ -42,30 +67,30 @@ class dslLexer :
             if char == " " or char == "\n" :
                 self._index += 1
 
-            elif self.isIdentifier() :
-                print(self.handleIdentifier())
+            elif self._isIdentifier() :
+                print(self._handleIdentifier())
 
-            elif self.isVisController() :
-                print(self.handleVisController())
+            elif self._isVisController() :
+                print(self._handleVisController())
 
-            elif self.isPunctuator() :
-                print(self.handlePunctuator())
+            elif self._isPunctuator() :
+                print(self._handlePunctuator())
             
-            elif self.isOperator() :
-                print(self.handleOperator())
+            elif self._isOperator() :
+                print(self._handleOperator())
 
-            elif self.isLiteral() :
-                print(self.handleLiteral())
+            elif self._isLiteral() :
+                print(self._handleLiteral())
 
-            elif self.isNumeric() :
-                print(self.handleNumeric())
+            elif self._isNumeric() :
+                print(self._handleNumeric())
 
             else :
                 self._index += 1
 
     # ********************************************  Character classifying functions  ********************************************
     
-    def isIdentifier(self) -> bool :
+    def _isIdentifier(self) -> bool :
         """
         Detects keywords and identifiers
         """
@@ -74,7 +99,7 @@ class dslLexer :
             return True
         return False
     
-    def isVisController(self) -> bool :
+    def _isVisController(self) -> bool :
         """
         Detects visibility controller
         """
@@ -89,7 +114,7 @@ class dslLexer :
             case _ :
                 return False
 
-    def isPunctuator(self) -> bool :
+    def _isPunctuator(self) -> bool :
         """
         Detects punctuators
         """
@@ -110,7 +135,7 @@ class dslLexer :
             case _ :
                 return False
             
-    def isOperator(self) -> bool :
+    def _isOperator(self) -> bool :
         """
         Detects operators
         """
@@ -121,7 +146,7 @@ class dslLexer :
             case _ :
                 return False
     
-    def isLiteral(self) -> bool :
+    def _isLiteral(self) -> bool :
         """
         Detects string literal start criteria
         """
@@ -130,7 +155,7 @@ class dslLexer :
             return True
         return False
     
-    def isNumeric(self) -> bool :
+    def _isNumeric(self) -> bool :
         """
         Detects numeric literal start criteria
         """
@@ -141,7 +166,7 @@ class dslLexer :
     
     # ********************************************  Category handling functions  ********************************************
 
-    def handleIdentifier(self) -> str :
+    def _handleIdentifier(self) -> str :
         """
         Accumulates keywords and identifiers
         """
@@ -160,7 +185,7 @@ class dslLexer :
 
         return accumulatedStr
     
-    def handleVisController(self) -> str :
+    def _handleVisController(self) -> str :
         """
         Returns visibility controller. (Pointless, done to keep everything similar)
         """
@@ -168,7 +193,7 @@ class dslLexer :
         self._index += 1
         return self.content[self._index - 1]
 
-    def handlePunctuator(self) -> str :
+    def _handlePunctuator(self) -> str :
         """
         Returns punctuator. (Pointless, done to keep everything similar)
         """
@@ -176,7 +201,7 @@ class dslLexer :
         self._index += 1
         return self.content[self._index - 1]
     
-    def handleOperator(self) -> str :
+    def _handleOperator(self) -> str :
         """
         Returns operator. (Pointless, done to keep everything similar)
         """
@@ -184,7 +209,7 @@ class dslLexer :
         self._index += 1
         return self.content[self._index - 1]
 
-    def handleLiteral(self) -> str :
+    def _handleLiteral(self) -> str :
         """
         Accumulates string literals
         """
@@ -200,7 +225,7 @@ class dslLexer :
 
         return accumulatedStr
     
-    def handleNumeric(self) -> str :
+    def _handleNumeric(self) -> str :
         """
         Accumulates numeric literals
         """
