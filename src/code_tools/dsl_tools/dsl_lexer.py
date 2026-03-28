@@ -149,21 +149,21 @@ class DslLexer :
             case _ :
                 return False
     
-    def _is_literal(self) -> bool :
-        """
-        Detects string literal start criteria
-        """
-
-        if self.contents[self._index] == "\"" :
-            return True
-        return False
-    
     def _is_numeric(self) -> bool :
         """
         Detects numeric literal start criteria
         """
 
         if self.contents[self._index].isdigit() or self.contents[self._index] == "." :
+            return True
+        return False
+    
+    def _is_literal(self) -> bool :
+        """
+        Detects string literal start criteria
+        """
+
+        if self.contents[self._index] == "\"" :
             return True
         return False
     
@@ -192,25 +192,25 @@ class DslLexer :
         # Match token type
         match token.tk_lexeme :
             case "class" :
-                token.tk_type = TokenType.TK_KW
+                token.tk_type = TokenType.TK_CLASS
             case "function" :
-                token.tk_type = TokenType.TK_KW
+                token.tk_type = TokenType.TK_FUNCT
             case "void" :
-                token.tk_type = TokenType.TK_KW
+                token.tk_type = TokenType.TK_VOID
             case "int" :
-                token.tk_type = TokenType.TK_KW
+                token.tk_type = TokenType.TK_INT
             case "char" :
-                token.tk_type = TokenType.TK_KW
+                token.tk_type = TokenType.TK_CHAR
             case "bool" :
-                token.tk_type = TokenType.TK_KW
+                token.tk_type = TokenType.TK_BOOL
             case "str" :
-                token.tk_type = TokenType.TK_KW
+                token.tk_type = TokenType.TK_STR
             case "float" :
-                token.tk_type = TokenType.TK_KW
+                token.tk_type = TokenType.TK_FLOAT
             case "True" :
-                token.tk_type = TokenType.TK_LIT
+                token.tk_type = TokenType.TK_LIT_BOOL
             case "False" :
-                token.tk_type = TokenType.TK_LIT
+                token.tk_type = TokenType.TK_LIT_BOOL
             case _ :
                 token.tk_type = TokenType.TK_IDEN
         
@@ -222,7 +222,16 @@ class DslLexer :
         """
         
         # Create Token object
-        token = Token(self._line, self._index - self._prev_lines + 1, self.contents[self._index], TokenType.TK_VIS_CTRL)
+        token = Token(self._line, self._index - self._prev_lines + 1, self.contents[self._index])
+
+        # Match token type
+        match token.tk_lexeme :
+            case "+" :
+                token.tk_type = TokenType.TK_VIS_PUB
+            case "#" :
+                token.tk_type = TokenType.TK_VIS_PROT
+            case "-" :
+                token.tk_type = TokenType.TK_VIS_PRIV
 
         return token
 
@@ -232,7 +241,22 @@ class DslLexer :
         """
         
         # Create Token object
-        token = Token(self._line, self._index - self._prev_lines + 1, self.contents[self._index], TokenType.TK_PUNC)
+        token = Token(self._line, self._index - self._prev_lines + 1, self.contents[self._index])
+
+        # Match token type
+        match token.tk_lexeme :
+            case "{" :
+                token.tk_type = TokenType.TK_L_BRACE
+            case "}" :
+                token.tk_type = TokenType.TK_R_BRACE
+            case "(" :
+                token.tk_type = TokenType.TK_L_PARAN
+            case ")" :
+                token.tk_type = TokenType.TK_R_PARAN
+            case "," :
+                token.tk_type = TokenType.TK_COMMA
+            case ":" :
+                token.tk_type = TokenType.TK_COLON
 
         return token
     
@@ -242,7 +266,32 @@ class DslLexer :
         """
         
         # Create Token object
-        token = Token(self._line, self._index - self._prev_lines + 1, self.contents[self._index], TokenType.TK_OPER)
+        token = Token(self._line, self._index - self._prev_lines + 1, self.contents[self._index])
+
+        # Match token type
+        match token.tk_lexeme :
+            case "=" :
+                token.tk_type = TokenType.TK_EQUALS
+
+        return token
+
+    def _handle_numeric(self) -> Token :
+        """
+        Accumulates numeric literals
+        """
+
+        # Create Token object
+        token = Token(self._line, self._index - self._prev_lines + 1, "", TokenType.TK_LIT_NUM)
+
+        # Accumulate till character differs from 0-9 or '.'
+        while self._index < len(self.contents) and self.contents[self._index].isdigit() or self.contents[self._index] == "." :
+            token.tk_lexeme += self.contents[self._index]
+            self._index += 1
+        self._index -= 1
+
+        # Check if only one decimal point '.' exists
+        if token.tk_lexeme.count(".") > 1 :
+            token.tk_type = TokenType.TK_UNDEF
 
         return token
 
@@ -252,7 +301,7 @@ class DslLexer :
         """
 
         # Create Token object
-        token = Token(self._line, self._index - self._prev_lines + 1, "", TokenType.TK_LIT)
+        token = Token(self._line, self._index - self._prev_lines + 1, "", TokenType.TK_LIT_STR)
 
         # Accumulate till end of literal '"'
         while self._index < len(self.contents) :
@@ -267,26 +316,6 @@ class DslLexer :
         if not token.tk_lexeme.endswith("\"") :
             token.tk_type = TokenType.TK_UNDEF
         
-        return token
-    
-    def _handle_numeric(self) -> Token :
-        """
-        Accumulates numeric literals
-        """
-
-        # Create Token object
-        token = Token(self._line, self._index - self._prev_lines + 1, "", TokenType.TK_LIT)
-
-        # Accumulate till character differs from 0-9 or '.'
-        while self._index < len(self.contents) and self.contents[self._index].isdigit() or self.contents[self._index] == "." :
-            token.tk_lexeme += self.contents[self._index]
-            self._index += 1
-        self._index -= 1
-
-        # Check if only one decimal point '.' exists
-        if token.tk_lexeme.count(".") > 1 :
-            token.tk_type = TokenType.TK_UNDEF
-
         return token
     
     def _handle_undef(self) -> Token :
