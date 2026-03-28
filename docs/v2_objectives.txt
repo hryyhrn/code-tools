@@ -1,0 +1,3 @@
+1. Add negative numeric literals (Add support on the parser's side)
+2. Add comments support
+3. Add meta tags and support for multiple languages (Might get pushed to v3)
