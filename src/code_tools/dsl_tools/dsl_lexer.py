@@ -284,7 +284,7 @@ class DslLexer :
         token = Token(self._line, self._index - self._prev_lines + 1, "", TokenType.TK_LIT_NUM)
 
         # Accumulate till character differs from 0-9 or '.'
-        while self._index < len(self.contents) and self.contents[self._index].isdigit() or self.contents[self._index] == "." :
+        while self._index < len(self.contents) and (self.contents[self._index].isdigit() or self.contents[self._index] == ".") :
             token.tk_lexeme += self.contents[self._index]
             self._index += 1
         self._index -= 1
