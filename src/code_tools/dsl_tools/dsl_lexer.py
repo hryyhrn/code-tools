@@ -12,7 +12,6 @@ class DslLexer :
         contents (str): contents of the .dsl file read
         _index (int): index of the characters being lexically analysed
     """
-
     def __init__(self) :
         """
         Init
@@ -20,7 +19,6 @@ class DslLexer :
         Args:
             path (str): Path to the .dsl file
         """
-        
         self.contents: str
         self._index: int
         self._line: int
@@ -35,7 +33,6 @@ class DslLexer :
         Returns:
             List[Token]: A list of Token objects containing lexemes from the .dsl file
         """
-        
         self._index = 0
         self._line = 1
         self._prev_lines = 0
@@ -49,7 +46,6 @@ class DslLexer :
         Args:
             path (str): Path to the .dsl file
         """
-
         with open(path, "r") as file :
             self.contents = file.read()
 
@@ -57,7 +53,6 @@ class DslLexer :
         """
         Lexically analyse the contents of the .dsl file, (the algo).
         """
-
         token_list = []
 
         while(self._index < len(self.contents)) :
@@ -97,7 +92,6 @@ class DslLexer :
         """
         Detects keywords and identifiers
         """
-
         if self.contents[self._index].isalpha() or self.contents[self._index] == "_" :
             return True
         return False
@@ -106,7 +100,6 @@ class DslLexer :
         """
         Detects visibility controller
         """
-
         match self.contents[self._index] :
             case "+" :
                 return True
@@ -121,7 +114,6 @@ class DslLexer :
         """
         Detects punctuators
         """
-
         match self.contents[self._index] :
             case "{" :
                 return True
@@ -142,7 +134,6 @@ class DslLexer :
         """
         Detects operators
         """
-
         match self.contents[self._index] :
             case "=" :
                 return True
@@ -153,7 +144,6 @@ class DslLexer :
         """
         Detects numeric literal start criteria
         """
-
         if self.contents[self._index].isdigit() or self.contents[self._index] == "." :
             return True
         return False
@@ -162,7 +152,6 @@ class DslLexer :
         """
         Detects string literal start criteria
         """
-
         if self.contents[self._index] == "\"" :
             return True
         return False
@@ -173,7 +162,6 @@ class DslLexer :
         """
         Accumulates keywords and identifiers
         """
-        
         # Create Token object
         token = Token(self._line, self._index - self._prev_lines + 1, "")
 
@@ -220,7 +208,6 @@ class DslLexer :
         """
         Returns visibility controller. (Pointless, done to keep everything similar)
         """
-        
         # Create Token object
         token = Token(self._line, self._index - self._prev_lines + 1, self.contents[self._index])
 
@@ -239,7 +226,6 @@ class DslLexer :
         """
         Returns punctuator. (Pointless, done to keep everything similar)
         """
-        
         # Create Token object
         token = Token(self._line, self._index - self._prev_lines + 1, self.contents[self._index])
 
@@ -264,7 +250,6 @@ class DslLexer :
         """
         Returns operator. (Pointless, done to keep everything similar)
         """
-        
         # Create Token object
         token = Token(self._line, self._index - self._prev_lines + 1, self.contents[self._index])
 
@@ -279,7 +264,6 @@ class DslLexer :
         """
         Accumulates numeric literals
         """
-
         # Create Token object
         token = Token(self._line, self._index - self._prev_lines + 1, "", TokenType.TK_LIT_NUM)
 
@@ -299,7 +283,6 @@ class DslLexer :
         """
         Accumulates string literals
         """
-
         # Create Token object
         token = Token(self._line, self._index - self._prev_lines + 1, "", TokenType.TK_LIT_STR)
 
@@ -322,7 +305,6 @@ class DslLexer :
         """
         Returns undefined tokens. (Pointless, done to keep everything similar)
         """
-        
         # Create Token object
         token = Token(self._line, self._index - self._prev_lines + 1, self.contents[self._index], TokenType.TK_UNDEF)
 

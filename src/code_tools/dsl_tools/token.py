@@ -6,7 +6,6 @@ class TokenType(Enum) :
     """
     Token type enum
     """
-    
     TK_UNDEF = "undefined"
 
     # Keywords
@@ -54,7 +53,6 @@ class Token :
         tk_lexeme (str): The actual token lexed
         tk_type (TokenType): Type of the token
     """
-
     line: int
     column: int
     tk_lexeme: str
