@@ -11,12 +11,7 @@ class TokenType(Enum) :
     # Keywords
     TK_CLASS = "class"
     TK_FUNCT = "function"
-    TK_VOID = "void"
-    TK_INT = "int"
-    TK_CHAR = "char"
-    TK_BOOL = "bool"
-    TK_STR = "str"
-    TK_FLOAT = "float"
+    TK_VAR_TYPE = "var_type"
     
     # Identifiers
     TK_IDEN = "identifier"

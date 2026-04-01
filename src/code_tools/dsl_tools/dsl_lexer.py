@@ -183,17 +183,17 @@ class DslLexer :
             case "function" :
                 token.tk_type = TokenType.TK_FUNCT
             case "void" :
-                token.tk_type = TokenType.TK_VOID
+                token.tk_type = TokenType.TK_VAR_TYPE
             case "int" :
-                token.tk_type = TokenType.TK_INT
+                token.tk_type = TokenType.TK_VAR_TYPE
             case "char" :
-                token.tk_type = TokenType.TK_CHAR
+                token.tk_type = TokenType.TK_VAR_TYPE
             case "bool" :
-                token.tk_type = TokenType.TK_BOOL
+                token.tk_type = TokenType.TK_VAR_TYPE
             case "str" :
-                token.tk_type = TokenType.TK_STR
+                token.tk_type = TokenType.TK_VAR_TYPE
             case "float" :
-                token.tk_type = TokenType.TK_FLOAT
+                token.tk_type = TokenType.TK_VAR_TYPE
             case "True" :
                 token.tk_type = TokenType.TK_LIT_BOOL
             case "False" :

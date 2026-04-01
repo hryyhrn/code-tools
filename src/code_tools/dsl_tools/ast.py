@@ -29,9 +29,9 @@ class ASTNode :
         name (str): Name of the AST node
         children (List[ASTNode]): List of references to the children of the AST node
     """
-    def __init__(self) :
-        self.name: str = ""
-        self.children: List[ASTNode] = None
+    def __init__(self, name = "") :
+        self.name: str = name
+        self.children: List[ASTNode] = []
         
 class ClassNode(ASTNode) :
     """
@@ -42,36 +42,42 @@ class ClassNode(ASTNode) :
 
 class FieldNode(ASTNode) :
     """
-    Field AST node
+    Field AST node. The value of the field is stored as Data AST nodes in the "children" attribute of the base AST class.
+
+    Attributes:
+        vis_ctrl (Visibility): Public, protected or private attribute visibility.
     """
     def __init__(self) :
         super().__init__()
-        self.dtype: DataType
         self.vis_ctrl: Visibility
-        self.val: VarNode
 
 class MethodNode(ASTNode) :
     """
-    Method AST node
+    Method AST node. The parameters of the method are stored as Data AST nodes in the "children" attribute of the base AST class.
+    
+    Attributes:
+        vis_ctrl (Visibility): Public, protected or private attribute visibility.
+        rtype (DataType): Datatype of the method's return value.
     """
     def __init__(self) :
         super().__init__()
-        self.rtype: DataType
         self.vis_ctrl: Visibility
-        self.param_list: List[VarNode]
+        self.rtype: DataType
 
 class FunctionNode(ASTNode) :
     """
-    Function AST node
+    Function AST node. The parameters of the function are stored as Data AST nodes in the "children" attribute of the base AST class.
+    
+    Attributes:
+        rtype (DataType): Datatype of the function's return value.
     """
     def __init__(self) :
         super().__init__()
         self.rtype: DataType
-        self.param_list: List[VarNode]
-
-class VarNode(ASTNode) :
+        
+class DataNode(ASTNode) :
     """
-    Parameter AST node
+    Data carrying AST node
     """
     def __init__(self) :
         super().__init__()
