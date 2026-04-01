@@ -4,7 +4,7 @@ from typing import List
 
 # Local
 from .token import Token, TokenType
-from .ast import ASTNode, ClassNode, FieldNode, MethodNode, FunctionNode, DataNode
+from .ast import ASTNode, ClassNode, FieldNode, MethodNode, FunctionNode, DataNode, DataType
 
 @dataclass
 class ParserStatus :
@@ -30,18 +30,17 @@ class DSLParser :
         self._index = 0
 
         while self._index < len(self._tokens_list) :
-            if self._tokens_list[self._index].tk_type == TokenType.TK_CLASS :
-                class_node = self._handle_class()
-                if class_node != None :
-                    self.tree.children.append(class_node)
-            elif self._tokens_list[self._index].tk_type == TokenType.TK_FUNCT :
-                function_node = self._handle_function()
-                if function_node != None :
-                    self.tree.children.append(function_node)
+            # if self._tokens_list[self._index].tk_type == TokenType.TK_CLASS :
+            #     class_node = self._handle_class()
+            #     if class_node != None :
+            #         self.tree.children.append(class_node)
+            if self._peek(TokenType.TK_FUNCT) :
+                res = self._handle_function(self.tree)
+                if not res.status :
+                    print(res.message)
             else :
                 # print("Invalid token sequence")
                 self._index += 1
-                return
 
     def _handle_function(self, parent: ASTNode) -> ParserStatus :
         """
@@ -66,7 +65,9 @@ class DSLParser :
             return ParserStatus(False, "Missing function L-Paran token")
 
         # Parse function parameters
-        self._handle_params(function_node)
+        param_parse_res = self._handle_params(function_node)
+        if not param_parse_res.status :
+            return param_parse_res
 
         # Look for the closing parenthesis, consume if found, throw error if not found
         if self._check_and_consume(TokenType.TK_R_PARAN) is None :
@@ -78,7 +79,7 @@ class DSLParser :
 
         # Look for the return type keyword, consume if found, throw error if not found
         if (lexeme := self._check_and_consume(TokenType.TK_VAR_TYPE)) is None :
-            return (False, "Missing function return type keyword")
+            return ParserStatus(False, "Missing function return type keyword")
         function_node.rtype = lexeme
 
         # Add function_node to the children of parent
@@ -108,10 +109,11 @@ class DSLParser :
         if self._check_and_consume(TokenType.TK_COLON) is None :
             return ParserStatus(False, "Missing colon separator after function parameter name")
 
-        # Look for the return type keyword
-        if self._check_and_consume(TokenType.TK_VAR_TYPE) is None :
+        # Look for the data type keyword
+        if (lexeme := self._check_and_consume(TokenType.TK_VAR_TYPE)) is None :
             return ParserStatus(False, "Missing parameter return type")
-        
+        parameter_node.dtype = self._datatype(lexeme)
+
         # Look for the assignment value token (optional)
         isValPresent = True
         if self._check_and_consume(TokenType.TK_EQUALS) is None :
@@ -147,7 +149,7 @@ class DSLParser :
             return None
         
         self._index += 1
-        return self._tokens_list[self._index].tk_lexeme
+        return self._tokens_list[self._index - 1].tk_lexeme
     
     def _peek(self, token_type: TokenType) -> str :
         """
@@ -160,3 +162,24 @@ class DSLParser :
         if self._index < len(self._tokens_list) and self._tokens_list[self._index].tk_type == token_type :
             return True
         return False
+    
+    def _datatype(self, lexeme: str) -> DataType :
+        """
+        Return the datatype enum corresponding to the datatype lexeme.
+
+        Args:
+            lexeme (str): datatype lexeme
+        """
+        match lexeme :
+            case "void" :
+                return DataType.void
+            case "int" :
+                return DataType.int
+            case "char" :
+                return DataType.char
+            case "bool" :
+                return DataType.bool
+            case "str" :
+                return DataType.str
+            case "float" :
+                return DataType.float
