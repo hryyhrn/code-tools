@@ -57,9 +57,11 @@ class DslLexer :
 
         while(self._index < len(self.contents)) :
             if self.contents[self._index] == " " or self.contents[self._index] == "\n" :
-                if self.contents[self._index] == "\n" :
+                self._index += 1
+                
+                if self.contents[self._index - 1] == "\n" :
                     self._line += 1
-                    self._prev_lines = self._index + 1
+                    self._prev_lines = self._index
 
             elif self._is_identifier() :
                 token_list.append(self._handle_identifier())
@@ -81,8 +83,6 @@ class DslLexer :
 
             else :
                 token_list.append(self._handle_undef())
-
-            self._index += 1
 
         return token_list
     
@@ -175,7 +175,6 @@ class DslLexer :
         ) :
             token.tk_lexeme += self.contents[self._index]
             self._index += 1
-        self._index -= 1
 
         # Match token type
         match token.tk_lexeme :
@@ -210,6 +209,8 @@ class DslLexer :
         """
         # Create Token object
         token = Token(self._line, self._index - self._prev_lines + 1, self.contents[self._index])
+        
+        self._index += 1
 
         # Match token type
         match token.tk_lexeme :
@@ -228,6 +229,8 @@ class DslLexer :
         """
         # Create Token object
         token = Token(self._line, self._index - self._prev_lines + 1, self.contents[self._index])
+
+        self._index += 1
 
         # Match token type
         match token.tk_lexeme :
@@ -253,6 +256,8 @@ class DslLexer :
         # Create Token object
         token = Token(self._line, self._index - self._prev_lines + 1, self.contents[self._index])
 
+        self._index += 1
+
         # Match token type
         match token.tk_lexeme :
             case "=" :
@@ -271,7 +276,6 @@ class DslLexer :
         while self._index < len(self.contents) and (self.contents[self._index].isdigit() or self.contents[self._index] == ".") :
             token.tk_lexeme += self.contents[self._index]
             self._index += 1
-        self._index -= 1
 
         # Check if only one decimal point '.' exists
         if token.tk_lexeme.count(".") > 1 :
@@ -293,7 +297,6 @@ class DslLexer :
 
             if self.contents[self._index - 1] == "\"" and len(token.tk_lexeme) > 1 :
                 break
-        self._index -= 1
 
         # Check if closing quote '"' exists
         if not token.tk_lexeme.endswith("\"") :
@@ -307,5 +310,7 @@ class DslLexer :
         """
         # Create Token object
         token = Token(self._line, self._index - self._prev_lines + 1, self.contents[self._index], TokenType.TK_UNDEF)
+
+        self._index += 1
 
         return token
