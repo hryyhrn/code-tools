@@ -17,9 +17,7 @@ class TokenType(Enum) :
     TK_IDEN = "identifier"
 
     # Visibility controllers
-    TK_VIS_PUB = "+"
-    TK_VIS_PROT = "#"
-    TK_VIS_PRIV = "-"
+    TK_VIS_CTRL = "vis_ctrl"
     
     # Punctuators
     TK_L_BRACE = "{"

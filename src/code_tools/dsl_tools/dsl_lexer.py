@@ -208,18 +208,9 @@ class DslLexer :
         Returns visibility controller. (Pointless, done to keep everything similar)
         """
         # Create Token object
-        token = Token(self._line, self._index - self._prev_lines + 1, self.contents[self._index])
+        token = Token(self._line, self._index - self._prev_lines + 1, self.contents[self._index], TokenType.TK_VIS_CTRL)
         
         self._index += 1
-
-        # Match token type
-        match token.tk_lexeme :
-            case "+" :
-                token.tk_type = TokenType.TK_VIS_PUB
-            case "#" :
-                token.tk_type = TokenType.TK_VIS_PROT
-            case "-" :
-                token.tk_type = TokenType.TK_VIS_PRIV
 
         return token
 
