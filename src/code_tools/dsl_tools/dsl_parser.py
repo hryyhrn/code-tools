@@ -17,6 +17,8 @@ class ParserStatus :
         message (str): Debug message
     """
     status: bool
+    line: int = -1
+    column: int = -1
     message: str = ""
 
 class DSLParser :
@@ -41,7 +43,12 @@ class DSLParser :
             elif self._peek(TokenType.TK_FUNCT) :
                 kw_parse_res = self._handle_function(self.tree)
             else :
-                return ParserStatus(False, "Invalid token sequence")
+                return ParserStatus(
+                    False, 
+                    self._tokens_list[self._index].line, 
+                    self._tokens_list[self._index].column, 
+                    "Invalid token sequence"
+                )
 
             if not kw_parse_res.status :
                 return kw_parse_res
@@ -63,12 +70,22 @@ class DSLParser :
 
         # Look for the class name identifier, consume if found, throw error if not found
         if (lexeme := self._check_and_consume(TokenType.TK_IDEN)) == None :
-            return ParserStatus(False, "Missing class name identifier")
+            return ParserStatus(
+                False,
+                self._tokens_list[self._index].line, 
+                self._tokens_list[self._index].column,
+                "Missing class name identifier"
+            )
         class_node.name = lexeme
 
         # Look for the opening brace, consume if found, throw error if not found
         if self._check_and_consume(TokenType.TK_L_BRACE) == None :
-            return ParserStatus(False, "Missing class L-Brace token")
+            return ParserStatus(
+                False,
+                self._tokens_list[self._index].line, 
+                self._tokens_list[self._index].column,
+                "Missing class L-Brace token"
+            )
         
         # Parse class fields and methods
         while True :
@@ -78,14 +95,24 @@ class DSLParser :
                 elif self._peek(TokenType.TK_L_PARAN, 2) != None :
                     member_parse_res = self._handle_method(class_node)
                 else :
-                    return ParserStatus(False, "Invalid class member syntax")
+                    return ParserStatus(
+                        False, 
+                        self._tokens_list[self._index].line, 
+                        self._tokens_list[self._index].column,
+                        "Invalid class member syntax"
+                    )
                 
                 if not member_parse_res.status :
                     return member_parse_res
             elif self._peek(TokenType.TK_R_BRACE) != None :
                 break
             else :
-                return ParserStatus(False, "Invalid class member syntax")
+                return ParserStatus(
+                    False,
+                    self._tokens_list[self._index].line, 
+                    self._tokens_list[self._index].column,
+                    "Invalid class member syntax"
+                )
         
         # Look for the closing brace, consume if found
         self._check_and_consume(TokenType.TK_R_BRACE)
@@ -110,7 +137,12 @@ class DSLParser :
 
         # Look for the field name identifier
         if (lexeme := self._peek(TokenType.TK_IDEN)) == None :
-            return ParserStatus(False, "Missing field name identifier")
+            return ParserStatus(
+                False,
+                self._tokens_list[self._index].line, 
+                self._tokens_list[self._index].column,
+                "Missing field name identifier"
+            )
         field_node.name = lexeme
 
         # Parse field data node
@@ -138,38 +170,75 @@ class DSLParser :
 
         # Look for the method name identifier, consume if found, throw error if not found
         if (lexeme := self._check_and_consume(TokenType.TK_IDEN)) == None :
-            return ParserStatus(False, "Missing method name identifier")
+            return ParserStatus(
+                False,
+                self._tokens_list[self._index].line, 
+                self._tokens_list[self._index].column,
+                "Missing method name identifier"
+            )
         method_node.name = lexeme
         
         # Look for the opening parenthesis, consume if found, throw error if not found
         if self._check_and_consume(TokenType.TK_L_PARAN) == None :
-            return ParserStatus(False, "Missing method L-Paran token")
+            return ParserStatus(
+                False,
+                self._tokens_list[self._index].line, 
+                self._tokens_list[self._index].column,
+                "Missing method L-Paran token"
+            )
         
         # Parse method parameters
         while True :
             if self._peek(TokenType.TK_IDEN) != None :
+                if self._peek(TokenType.TK_L_PARAN, -1) == None and self._peek(TokenType.TK_COMMA, -1) == None :
+                    return ParserStatus(
+                        False,
+                        self._tokens_list[self._index].line, 
+                        self._tokens_list[self._index].column,
+                        "Missing \",\" punctuator before parameter identifier"
+                    )
+                
                 param_parse_res = self._handle_data(method_node)
                 if not param_parse_res.status :
                     return param_parse_res
             elif self._check_and_consume(TokenType.TK_COMMA) != None :
                 if self._peek(TokenType.TK_IDEN) == None :
-                    return ParserStatus(False, "Missing identifier after \",\" punctuator")
+                    return ParserStatus(
+                        False,
+                        self._tokens_list[self._index].line, 
+                        self._tokens_list[self._index].column,
+                        "Missing identifier after \",\" punctuator"
+                    )
             elif self._peek(TokenType.TK_R_PARAN) :
                 break
             else :
-                print(self._tokens_list[self._index])
-                return ParserStatus(False, "Invalid method signature")
+                return ParserStatus(
+                    False,
+                    self._tokens_list[self._index].line, 
+                    self._tokens_list[self._index].column,
+                    "Invalid method signature"
+                )
 
         # Look for the closing parenthesis, consume if found
         self._check_and_consume(TokenType.TK_R_PARAN)
 
         # Look for the return type separator colon, consume if found, throw error if not found
         if self._check_and_consume(TokenType.TK_COLON) == None :
-            return ParserStatus(False, "Missing method return type separator colon")
+            return ParserStatus(
+                False,
+                self._tokens_list[self._index].line, 
+                self._tokens_list[self._index].column,
+                "Missing method return type separator colon"
+            )
 
         # Look for the return type keyword, consume if found, throw error if not found
         if (lexeme := self._check_and_consume(TokenType.TK_VAR_TYPE)) == None :
-            return ParserStatus(False, "Missing method return type keyword")
+            return ParserStatus(
+                False,
+                self._tokens_list[self._index].line, 
+                self._tokens_list[self._index].column,
+                "Missing method return type keyword"
+            )
         method_node.rtype = lexeme
 
         # Add method_node to the children of parent
@@ -192,38 +261,75 @@ class DSLParser :
 
         # Look for the function name identifier, consume if found, throw error if not found
         if (lexeme := self._check_and_consume(TokenType.TK_IDEN)) == None :
-            return ParserStatus(False, "Missing function name identifier")
+            return ParserStatus(
+                False,
+                self._tokens_list[self._index].line, 
+                self._tokens_list[self._index].column,
+                "Missing function name identifier"
+            )
         function_node.name = lexeme
 
         # Look for the opening parenthesis, consume if found, throw error if not found
         if self._check_and_consume(TokenType.TK_L_PARAN) == None :
-            return ParserStatus(False, "Missing function L-Paran token")
+            return ParserStatus(
+                False,
+                self._tokens_list[self._index].line, 
+                self._tokens_list[self._index].column,
+                "Missing function L-Paran token"
+            )
 
         # Parse function parameters
         while True :
             if self._peek(TokenType.TK_IDEN) != None :
+                if self._peek(TokenType.TK_L_PARAN, -1) == None and self._peek(TokenType.TK_COMMA, -1) == None :
+                    return ParserStatus(
+                        False,
+                        self._tokens_list[self._index].line, 
+                        self._tokens_list[self._index].column,
+                        "Missing \",\" punctuator before parameter identifier"
+                    )
+                
                 param_parse_res = self._handle_data(function_node)
                 if not param_parse_res.status :
                     return param_parse_res
             elif self._check_and_consume(TokenType.TK_COMMA) != None :
                 if self._peek(TokenType.TK_IDEN) == None :
-                    return ParserStatus(False, "Missing identifier after \",\" punctuator")
+                    return ParserStatus(
+                        False,
+                        self._tokens_list[self._index].line, 
+                        self._tokens_list[self._index].column,
+                        "Missing identifier after \",\" punctuator"
+                    )
             elif self._peek(TokenType.TK_R_PARAN) :
                 break
             else :
-                print(self._tokens_list[self._index])
-                return ParserStatus(False, "Invalid function signature")
+                return ParserStatus(
+                    False,
+                    self._tokens_list[self._index].line, 
+                    self._tokens_list[self._index].column,
+                    "Invalid function signature"
+                )
 
         # Look for the closing parenthesis, consume if found
         self._check_and_consume(TokenType.TK_R_PARAN)
 
         # Look for the return type separator colon, consume if found, throw error if not found
         if self._check_and_consume(TokenType.TK_COLON) == None :
-            return ParserStatus(False, "Missing function return type separator colon")
+            return ParserStatus(
+                False, 
+                self._tokens_list[self._index].line, 
+                self._tokens_list[self._index].column,
+                "Missing function return type separator colon"
+            )
 
         # Look for the return type keyword, consume if found, throw error if not found
         if (lexeme := self._check_and_consume(TokenType.TK_VAR_TYPE)) == None :
-            return ParserStatus(False, "Missing function return type keyword")
+            return ParserStatus(
+                False,
+                self._tokens_list[self._index].line, 
+                self._tokens_list[self._index].column,
+                "Missing function return type keyword"
+            )
         function_node.rtype = lexeme
 
         # Add function_node to the children of parent
@@ -243,16 +349,31 @@ class DSLParser :
 
         # Look for data node's name identifier, consume if found, throw error if not found
         if (lexeme := self._check_and_consume(TokenType.TK_IDEN)) == None :
-            return ParserStatus(False, "Missing variable/parameter name")
+            return ParserStatus(
+                False,
+                self._tokens_list[self._index].line, 
+                self._tokens_list[self._index].column,
+                "Missing field/parameter name"
+            )
         data_node.name = lexeme
 
         # Look for the colon separator token, consume if found, throw error if not found
         if self._check_and_consume(TokenType.TK_COLON) == None :
-            return ParserStatus(False, "Missing colon after variable/parameter name")
+            return ParserStatus(
+                False,
+                self._tokens_list[self._index].line, 
+                self._tokens_list[self._index].column,
+                "Missing colon after field/parameter name"
+            )
 
         # Look for the datatype keyword, consume if found, throw error if not found
         if (lexeme := self._check_and_consume(TokenType.TK_VAR_TYPE)) == None :
-            return ParserStatus(False, "Missing variable/parameter datatype")
+            return ParserStatus(
+                False,
+                self._tokens_list[self._index].line, 
+                self._tokens_list[self._index].column,
+                "Missing field/parameter datatype"
+            )
         data_node.dtype = self._datatype(lexeme)
 
         # Look for the assignment value token (optional)
@@ -266,7 +387,12 @@ class DSLParser :
             (lexeme := self._check_and_consume(TokenType.TK_LIT_NUM)) == None and
             (lexeme := self._check_and_consume(TokenType.TK_LIT_STR)) == None
         ) :
-            return ParserStatus(False, "Missing parameter literal value after \"=\"")
+            return ParserStatus(
+                False,
+                self._tokens_list[self._index].line, 
+                self._tokens_list[self._index].column,
+                "Missing parameter literal value after \"=\""
+            )
         data_node.value = lexeme
 
         # Add data_node to the children of parent

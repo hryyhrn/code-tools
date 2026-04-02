@@ -20,6 +20,6 @@ if __name__ == "__main__" :
     parser = DSLParser()
     res = parser.parse(tokens_list)
     if not res.status :
-        print(res.message)
+        print(f"Pos: {res.line, res.column}, Error: {res.message}")
 
     traverse_tree(parser.tree, 0)
